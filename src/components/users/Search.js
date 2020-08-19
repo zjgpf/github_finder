@@ -1,34 +1,36 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, Fragment, useContext } from 'react';
+import GithubContext from '../../context/github/githubContext';
+import AlertContext from '../../context/alert/alertContext';
 
-class Search extends Component {
+const Search = () => {
 
-  state = { text: '' };
+  const githubContext = useContext(GithubContext);
+  const alertContext = useContext(AlertContext);
 
-  onChange = e => this.setState({[ e.target.name ]: e.target.value});
+  const [ text, setText] = useState('');
 
-  onSubmit = e => {
+  const onChange = e => setText( e.target.value );
+
+  const onSubmit = e => {
     e.preventDefault();
-    if( this.state.text !== '') {
-      this.props.search(this.state.text);
-      this.setState({ text: '' });
+    if( text !== '') {
+      githubContext.searchUsers(text);
+      setText('');
     }
     else {
-      this.props.setAlert(true);
+      alertContext.setAlert();
     }
   }
 
-  render() {
-    const { clear, showClear } = this.props;
     return (
-    <Fragment>
-      <form onSubmit={this.onSubmit}>
-        <input type='text' name='text' onChange={this.onChange} value={this.state.text} placeholder='Enter name...' />
-        <input type='submit' className='btn btn-dark btn-block' />
-      </form>
-      {showClear && (<button className='btn btn-light btn-block' onClick={clear}>clear</button>)}
-    </Fragment>
+      <Fragment>
+        <form onSubmit={onSubmit}>
+          <input type='text' name='text' onChange={onChange} value={text} placeholder='Enter name...' />
+          <input type='submit' className='btn btn-dark btn-block' />
+        </form>
+        {githubContext.users.length > 0 && (<button className='btn btn-light btn-block' onClick={githubContext.clearUsers}>clear</button>)}
+      </Fragment>
     )
-  }
 
 }
 
